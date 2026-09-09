@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>럭셔리 파이썬 카지노 웹앱</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Top Navigation Header -->
+    <header class="navbar">
+        <div class="logo">🎰 ROYALE CASINO</div>
+        <div class="balance-container">
+            <span class="chip-icon">🪙</span>
+            <span class="balance-label">잔액:</span>
+            <span id="user-balance" class="balance-amount">${{ "{:,}".format(balance) }}</span>
+            <button id="reset-btn" class="btn-reset" title="칩 리셋">$10,000 충전</button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="main-layout">
+        <!-- Game Sidebar Navigation -->
+        <nav class="sidebar">
+            <button class="nav-btn active" data-game="roulette">🎡 룰렛 (Roulette)</button>
+            <button class="nav-btn" data-game="craps">🎲 크랩스 (Craps)</button>
+            <button class="nav-btn" data-game="slots">🎰 슬롯머신 (Slots)</button>
+            <button class="nav-btn" data-game="dreamcatcher">🎯 드림 캐처 (Big Wheel)</button>
+            <button class="nav-btn" data-game="sicbo">🪘 시코 (Sic Bo)</button>
+        </nav>
+
+        <!-- Game Stage Arena -->
+        <section class="game-arena">
+            
+            <!-- 1. ROULETTE SECTION -->
+            <div id="game-roulette" class="game-panel active">
+                <div class="game-header">
+                    <h2>🎡 유러피언 룰렛 (European Roulette)</h2>
+                    <p>숫자(35배), 색상(1배), 홀/짝(1배), 고/저(1배) 영역에 배팅하세요.</p>
+                </div>
+                <div class="roulette-display">
+                    <div id="roulette-wheel" class="wheel-visual">
+                        <span id="roulette-result-number">?</span>
+                    </div>
+                </div>
+                <div class="betting-controls">
+                    <div class="input-group">
+                        <label>배팅 금액($):</label>
+                        <input type="number" id="roulette-bet-amount" value="100" min="10">
+                    </div>
+                    <div class="bet-options">
+                        <button class="bet-btn" onclick="playRoulette('red', 'red')">🔴 Red (1:1)</button>
+                        <button class="bet-btn" onclick="playRoulette('black', 'black')">⚫ Black (1:1)</button>
+                        <button class="bet-btn" onclick="playRoulette('even', 'even')">짝수 (Even)</button>
+                        <button class="bet-btn" onclick="playRoulette('odd', 'odd')">홀수 (Odd)</button>
+                        <button class="bet-btn" onclick="playRoulette('low', 'low')">Low (1-18)</button>
+                        <button class="bet-btn" onclick="playRoulette('high', 'high')">High (19-36)</button>
+                    </div>
+                    <div class="single-num-bet">
+                        <input type="number" id="roulette-single-num" min="0" max="36" placeholder="0-36 지정">
+                        <button class="bet-btn gold-btn" onclick="playRouletteSingle()">단일 숫자 배팅 (35배)</button>
+                    </div>
+                </div>
+                <div id="roulette-status" class="status-msg">배팅을 진행해주세요.</div>
+            </div>
+
+            <!-- 2. CRAPS SECTION -->
+            <div id="game-craps" class="game-panel">
+                <div class="game-header">
+                    <h2>🎲 크랩스 (Craps)</h2>
+                    <p>첫 던지기(Come-out)에서 7/11은 승리, 2/3/12는 패배입니다. 그 외 숫자는 Point가 됩니다.</p>
+                </div>
+                <div class="craps-board">
+                    <div class="point-badge">목표 점수 (POINT): <span id="craps-point-display">없음</span></div>
+                    <div class="dice-container">
+                        <div id="dice1" class="dice">?</div>
+                        <div id="dice2" class="dice">?</div>
+                    </div>
+                </div>
+                <div class="betting-controls">
+                    <div class="input-group">
+                        <label>Pass Line 배팅 금액($):</label>
+                        <input type="number" id="craps-bet-amount" value="100" min="10">
+                    </div>
+                    <button class="bet-btn gold-btn large-btn" onclick="playCraps()">🎲 주사위 굴리기 (Roll Dice)</button>
+                </div>
+                <div id="craps-status" class="status-msg">주사위를 던져 게임을 시작하세요.</div>
+            </div>
+
+            <!-- 3. SLOTS SECTION -->
+            <div id="game-slots" class="game-panel">
+                <div class="game-header">
+                    <h2>🎰 클래식 슬롯머신 (Slot Machine)</h2>
+                    <p>심볼 3개를 맞춰 높은 배당을 획득하세요! 🃏(Wild)는 모든 기호를 대체합니다.</p>
+                </div>
+                <div class="slot-machine-display">
+                    <div class="slot-reel" id="reel1">7️⃣</div>
+                    <div class="slot-reel" id="reel2">7️⃣</div>
+                    <div class="slot-reel" id="reel3">7️⃣</div>
+                </div>
+                <div class="betting-controls">
+                    <div class="input-group">
+                        <label>스핀 배팅 금액($):</label>
+                        <input type="number" id="slots-bet-amount" value="100" min="10">
+                    </div>
+                    <button class="bet-btn gold-btn large-btn" onclick="playSlots()">🎰 SPIN!</button>
+                </div>
+                <div id="slots-status" class="status-msg">레버를 당겨 스핀을 시작하세요.</div>
+            </div>
+
+            <!-- 4. DREAM CATCHER SECTION -->
+            <div id="game-dreamcatcher" class="game-panel">
+                <div class="game-header">
+                    <h2>🎯 드림 캐처 / 빅 휠 (Dream Catcher)</h2>
+                    <p>거대한 휠이 정지할 숫자를 맞히세요! (1, 2, 5, 10, 20, 40배당)</p>
+                </div>
+                <div class="wheel-display-container">
+                    <div id="big-wheel" class="big-wheel-visual">
+                        <span id="wheel-target-result">🎯</span>
+                    </div>
+                </div>
+                <div class="betting-controls">
+                    <div class="input-group">
+                        <label>배팅 금액($):</label>
+                        <input type="number" id="dream-bet-amount" value="100" min="10">
+                    </div>
+                    <div class="bet-options grid-options">
+                        <button class="bet-btn" onclick="playDreamCatcher('1')">1 (1배당)</button>
+                        <button class="bet-btn" onclick="playDreamCatcher('2')">2 (2배당)</button>
+                        <button class="bet-btn" onclick="playDreamCatcher('5')">5 (5배당)</button>
+                        <button class="bet-btn" onclick="playDreamCatcher('10')">10 (10배당)</button>
+                        <button class="bet-btn" onclick="playDreamCatcher('20')">20 (20배당)</button>
+                        <button class="bet-btn gold-btn" onclick="playDreamCatcher('40')">40 (40배당)</button>
+                    </div>
+                </div>
+                <div id="dream-status" class="status-msg">원하는 숫자에 배팅하세요.</div>
+            </div>
+
+            <!-- 5. SIC BO SECTION -->
+            <div id="game-sicbo" class="game-panel">
+                <div class="game-header">
+                    <h2>🪘 시코 (Sic Bo - 주사위 게임)</h2>
+                    <p>3개 주사위 합의 소/대(Small/Big), 싱글 번호, 또는 트리플을 맞춰보세요.</p>
+                </div>
+                <div class="sicbo-display">
+                    <div class="sicbo-cup">
+                        <span id="sicbo-d1" class="dice-mini">?</span>
+                        <span id="sicbo-d2" class="dice-mini">?</span>
+                        <span id="sicbo-d3" class="dice-mini">?</span>
+                    </div>
+                    <div class="sicbo-sum">합계: <span id="sicbo-sum-val">0</span></div>
+                </div>
+                <div class="betting-controls">
+                    <div class="input-group">
+                        <label>배팅 금액($):</label>
+                        <input type="number" id="sicbo-bet-amount" value="100" min="10">
+                    </div>
+                    <div class="bet-options">
+                        <button class="bet-btn" onclick="playSicBo('small', null)">Small (4~10)</button>
+                        <button class="bet-btn" onclick="playSicBo('big', null)">Big (11~17)</button>
+                        <button class="bet-btn gold-btn" onclick="playSicBo('triple', 'any')">트리플 (150배)</button>
+                    </div>
+                </div>
+                <div id="sicbo-status" class="status-msg">배팅 옵션을 선택하세요.</div>
+            </div>
+
+        </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
